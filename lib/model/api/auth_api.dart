@@ -86,7 +86,7 @@ class AuthAPI with ChangeNotifier {
 
   /// Login user
   Future<bool> login(String email, String password) async {
-    _status = Status.authenticated;
+    _status = Status.uninitialized;
     _notification = null;
     notifyListeners();
 
@@ -106,16 +106,17 @@ class AuthAPI with ChangeNotifier {
       _status = Status.authenticated;
       _token = apiResponse['token'];
       await storeUserData(apiResponse);
+      _status = Status.authenticated;
       notifyListeners();
       return true;
     }
 
     if (response.statusCode == 401) {
-      _status = Status.unauthenticated;
       _notification = const NotificationText(
         text: 'Invalid email or password.',
         type: 'type',
       );
+      _status = Status.unauthenticated;
       notifyListeners();
       return false;
     }

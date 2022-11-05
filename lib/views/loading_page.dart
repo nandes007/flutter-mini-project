@@ -16,11 +16,14 @@ class LoadingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Laudry App'),
+        backgroundColor: Colors.green,
       ),
       body: const Center(
         child: Padding(
           padding: EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 0.0),
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          ),
         ),
       ),
     );

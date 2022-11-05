@@ -3,6 +3,8 @@ import 'package:laundry_app/model/api/auth_api.dart';
 import 'package:laundry_app/model/api/transaction_api.dart';
 import 'package:laundry_app/model/transaction_model.dart';
 
+enum TransactionViewState { none, loading, error }
+
 class TransactionViewModel with ChangeNotifier {
   AuthAPI authAPI = AuthAPI();
   List<TransactionModel> _transactions = [];
@@ -10,18 +12,29 @@ class TransactionViewModel with ChangeNotifier {
 
   TransactionAPI transactionAPI = TransactionAPI();
 
+  TransactionViewState _state = TransactionViewState.none;
+  TransactionViewState get state => _state;
+  changeState(TransactionViewState s) {
+    _state = s;
+    notifyListeners();
+  }
+
   initTransactionProvider() async {
     await getAllTransactions();
     notifyListeners();
   }
 
   Future<bool> addTransaction(TransactionModel transactionModel) async {
+    changeState(TransactionViewState.loading);
+
     try {
       final trf = await transactionAPI.save(transactionModel.toJson());
       _transactions.add(trf);
       notifyListeners();
+      changeState(TransactionViewState.none);
       return true;
     } catch (e) {
+      changeState(TransactionViewState.error);
       return false;
       // rethrow;
     }
@@ -37,9 +50,14 @@ class TransactionViewModel with ChangeNotifier {
     }
   }
 
-  deleteTransaction(int id) async {
+  deleteTransaction(int id, int index) async {
     try {
-      final t = await transactionAPI.destroy(id);
+      final result = await transactionAPI.destroy(id);
+      if (result) {
+        _transactions.removeAt(index);
+        notifyListeners();
+      }
+      notifyListeners();
     } catch (e) {
       rethrow;
     }

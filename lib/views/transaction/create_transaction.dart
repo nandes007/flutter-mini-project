@@ -4,6 +4,8 @@ import 'package:laundry_app/model/transaction_model.dart';
 import 'package:laundry_app/view_model/transaction_view_model.dart';
 import 'package:provider/provider.dart';
 
+const List<String> statuses = <String>['Created', 'Completed'];
+
 class CreateTransaction extends StatefulWidget {
   const CreateTransaction({super.key});
 
@@ -12,6 +14,14 @@ class CreateTransaction extends StatefulWidget {
 }
 
 class _CreateTransactionState extends State<CreateTransaction> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      var viewModel = Provider.of<TransactionViewModel>(context, listen: false);
+    });
+  }
+
   final _formKey = GlobalKey<FormState>();
   final _beginDate = TextEditingController();
   final _customerName = TextEditingController();
@@ -42,22 +52,23 @@ class _CreateTransactionState extends State<CreateTransaction> {
       ),
     );
 
-    setState(() {
-      if (result) {
-        _beginDate.text = '';
-        _customerName.text = '';
-        _phoneNumber.text = '';
-        _weight.text = '';
-        _service.text = '';
-        _grandTotal.text = '';
-        _estimateDate.text = '';
-        _endDate.text = '';
-        _status.text = '';
-        _description.text = '';
-      }
-    });
+    if (result) {
+      _beginDate.text = '';
+      _customerName.text = '';
+      _phoneNumber.text = '';
+      _weight.text = '';
+      _service.text = '';
+      _grandTotal.text = '';
+      _estimateDate.text = '';
+      _endDate.text = '';
+      _status.text = '';
+      _description.text = '';
+    }
+
+    setState(() {});
   }
 
+  String valueStatus = statuses.first;
   final currentDate = DateTime.now();
   DateTime _dueDate = DateTime.now();
   String dateFormat(stringDate) {
@@ -67,6 +78,21 @@ class _CreateTransactionState extends State<CreateTransaction> {
 
   @override
   Widget build(BuildContext context) {
+    final modelView = Provider.of<TransactionViewModel>(context);
+    final isLoading = modelView.state == TransactionViewState.loading;
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Create Transaction'),
+          backgroundColor: Colors.green,
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Transaction'),

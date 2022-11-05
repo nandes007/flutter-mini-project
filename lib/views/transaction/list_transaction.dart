@@ -10,7 +10,12 @@ class ListTransaction extends StatefulWidget {
 }
 
 class _ListTransactionState extends State<ListTransaction> {
-  @override
+  Future<void> deleteTransaction(id, index) async {
+    await Provider.of<TransactionViewModel>(context, listen: false)
+        .deleteTransaction(id, index);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final modelView = Provider.of<TransactionViewModel>(context);
@@ -112,7 +117,12 @@ class _ListTransactionState extends State<ListTransaction> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await deleteTransaction(
+                                    transaction.id,
+                                    index,
+                                  );
+                                },
                                 icon: const Icon(Icons.delete_forever),
                                 label: const Text('Delete'),
                               ),
