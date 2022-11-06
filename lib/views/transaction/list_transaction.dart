@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:laundry_app/view_model/transaction_view_model.dart';
+import 'package:laundry_app/views/transaction/show_transaction.dart';
 import 'package:provider/provider.dart';
 
 class ListTransaction extends StatefulWidget {
@@ -14,6 +15,23 @@ class _ListTransactionState extends State<ListTransaction> {
     await Provider.of<TransactionViewModel>(context, listen: false)
         .deleteTransaction(id, index);
     setState(() {});
+  }
+
+  Future<void> getTransactionById(id) async {
+    var result = await Provider.of<TransactionViewModel>(context, listen: false)
+        .getTransactionById(id);
+
+    if (result != null) {
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ShowTransaction(
+            transactionModel: result,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -53,20 +71,39 @@ class _ListTransactionState extends State<ListTransaction> {
                               ),
                             ),
                           ),
-                          Container(
-                            width: 80,
-                            padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Status',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
+                          transaction.status == 'Created'
+                              ? Container(
+                                  width: 80,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      transaction.status,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  width: 80,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      transaction.status,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
                         ],
                       ),
                       const SizedBox(
@@ -88,7 +125,7 @@ class _ListTransactionState extends State<ListTransaction> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(transaction.grandTotal),
+                            child: Text(transaction.grandTotal.toString()),
                           ),
                           Expanded(
                             child: Text(transaction.service),
@@ -104,9 +141,11 @@ class _ListTransactionState extends State<ListTransaction> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await getTransactionById(transaction.id);
+                                },
                                 icon: const Icon(Icons.edit),
-                                label: const Text('Edit'),
+                                label: const Text('Show'),
                               ),
                             ),
                           ),

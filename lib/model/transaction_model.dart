@@ -27,9 +27,9 @@ class TransactionModel {
   String beginDate;
   String customerName;
   String phoneNumber;
-  String weight;
+  double weight;
   String service;
-  String grandTotal;
+  double grandTotal;
   String estimateDate;
   String? endDate;
   String status;
@@ -43,9 +43,9 @@ class TransactionModel {
         beginDate: json["begin_date"].toString(),
         customerName: json["customer_name"],
         phoneNumber: json["phone_number"],
-        weight: json["weight"],
+        weight: json["weight"].toDouble(),
         service: json["service"],
-        grandTotal: json["grand_total"],
+        grandTotal: json["grand_total"].toDouble(),
         estimateDate: json["estimate_date"].toString(),
         endDate: json["end_date"].toString(),
         status: json["status"],

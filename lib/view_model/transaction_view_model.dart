@@ -36,7 +36,6 @@ class TransactionViewModel with ChangeNotifier {
     } catch (e) {
       changeState(TransactionViewState.error);
       return false;
-      // rethrow;
     }
   }
 
@@ -47,6 +46,36 @@ class TransactionViewModel with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<TransactionModel> getTransactionById(id) async {
+    try {
+      final t = await transactionAPI.show(id);
+      notifyListeners();
+      return t;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  markAsCompleteTransaction(int? id, String status) async {
+    changeState(TransactionViewState.loading);
+
+    try {
+      await transactionAPI.update(id, status);
+      for (var element in _transactions) {
+        if (element.id == id) {
+          element.status = status;
+          notifyListeners();
+        }
+      }
+      notifyListeners();
+      changeState(TransactionViewState.none);
+      return true;
+    } catch (e) {
+      changeState(TransactionViewState.error);
+      return false;
     }
   }
 

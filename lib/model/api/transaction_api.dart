@@ -34,9 +34,9 @@ class TransactionAPI {
             beginDate: e['begin_date'].toString(),
             customerName: e['customer_name'],
             phoneNumber: e['phone_number'],
-            weight: e['weight'].toString(),
+            weight: e['weight'].toDouble(),
             service: e['service'],
-            grandTotal: e['grand_total'].toString(),
+            grandTotal: e['grand_total'].toDouble(),
             estimateDate: e['estimate_date'].toString(),
             endDate: e['end_date'].toString(),
             status: e['status'],
@@ -46,6 +46,21 @@ class TransactionAPI {
         .toList();
     validateResponseStatus(response.statusCode, 200);
     return transactions;
+  }
+
+  Future<TransactionModel> show(int id) async {
+    final response = await http.get(
+      Uri.parse('${Api.transactions}/$id'),
+      headers: <String, String>{
+        'Accept': 'application/json;',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    Map<String, dynamic> apiResponse = jsonDecode(response.body);
+    var result = TransactionModel.fromJson(apiResponse["data"]);
+
+    return result;
   }
 
   Future<TransactionModel> save(Map<String, dynamic> body) async {
@@ -62,6 +77,23 @@ class TransactionAPI {
     var result = TransactionModel.fromJson(apiResponse["data"]);
 
     validateResponseStatus(response.statusCode, 201);
+    return result;
+  }
+
+  Future<bool> update(int? id, String status) async {
+    var body = <String, dynamic>{'status': status};
+
+    final response = await http.put(
+      Uri.parse('${Api.transactions}/$id'),
+      headers: <String, String>{
+        'Accept': 'application/json;',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(body),
+    );
+
+    Map<String, dynamic> apiResponse = jsonDecode(response.body);
+    var result = apiResponse["status"];
     return result;
   }
 

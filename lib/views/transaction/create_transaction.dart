@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:laundry_app/model/transaction_model.dart';
 import 'package:laundry_app/view_model/transaction_view_model.dart';
+import 'package:laundry_app/views/transaction/list_transaction.dart';
 import 'package:provider/provider.dart';
 
 const List<String> statuses = <String>['Created', 'Completed'];
+const List<String> services = <String>['Regular', 'Express'];
 
 class CreateTransaction extends StatefulWidget {
   const CreateTransaction({super.key});
@@ -17,9 +19,16 @@ class _CreateTransactionState extends State<CreateTransaction> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      var viewModel = Provider.of<TransactionViewModel>(context, listen: false);
-    });
+    _service = services.first;
+    _status = statuses.first;
+    _beginDate.text = '';
+    _customerName.text = '';
+    _phoneNumber.text = '';
+    _weight.text = '';
+    _grandTotal.text = '';
+    _estimateDate.text = '';
+    _endDate.text = '';
+    _description.text = '';
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -27,11 +36,9 @@ class _CreateTransactionState extends State<CreateTransaction> {
   final _customerName = TextEditingController();
   final _phoneNumber = TextEditingController();
   final _weight = TextEditingController();
-  final _service = TextEditingController();
   final _grandTotal = TextEditingController();
   final _estimateDate = TextEditingController();
   final _endDate = TextEditingController();
-  final _status = TextEditingController();
   final _description = TextEditingController();
 
   Future<void> submit() async {
@@ -42,33 +49,31 @@ class _CreateTransactionState extends State<CreateTransaction> {
         beginDate: _beginDate.text,
         customerName: _customerName.text,
         phoneNumber: _phoneNumber.text,
-        weight: _weight.text,
-        service: _service.text,
-        grandTotal: _grandTotal.text,
+        weight: double.parse(_weight.text),
+        service: _service,
+        grandTotal: double.parse(_grandTotal.text),
         estimateDate: _estimateDate.text,
         endDate: _endDate.text,
-        status: _status.text,
+        status: _status,
         description: _description.text,
       ),
     );
 
     if (result) {
-      _beginDate.text = '';
-      _customerName.text = '';
-      _phoneNumber.text = '';
-      _weight.text = '';
-      _service.text = '';
-      _grandTotal.text = '';
-      _estimateDate.text = '';
-      _endDate.text = '';
-      _status.text = '';
-      _description.text = '';
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ListTransaction(),
+        ),
+      );
     }
 
     setState(() {});
   }
 
-  String valueStatus = statuses.first;
+  String _status = statuses.first;
+  String _service = services.first;
   final currentDate = DateTime.now();
   DateTime _dueDate = DateTime.now();
   String dateFormat(stringDate) {
@@ -212,6 +217,20 @@ class _CreateTransactionState extends State<CreateTransaction> {
             ),
             TextField(
               controller: _weight,
+              keyboardType: TextInputType.number,
+              onChanged: ((value) {
+                var cost = 0.0;
+                if (_service == 'Regular') {
+                  cost = 7000.0;
+                  cost *= double.parse(value);
+                } else if (_service == 'Express') {
+                  cost = 10000.0;
+                  cost *= double.parse(value);
+                }
+                setState(() {
+                  _grandTotal.text = cost.toString();
+                });
+              }),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
@@ -237,35 +256,54 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
-              controller: _service,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Service',
+                  style: TextStyle(color: Colors.green),
+                ),
+                DropdownButton<String>(
+                  value: _service,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  elevation: 16,
+                  isExpanded: true,
+                  style: const TextStyle(color: Colors.green, fontSize: 16),
+                  underline: Container(
+                    height: 1,
                     color: Colors.green,
                   ),
+                  onChanged: (String? value) {
+                    double cost = 0.0;
+                    if (value == 'Regular') {
+                      cost = 7000.0;
+                      var weightParse = double.parse(_weight.text);
+                      cost *= weightParse;
+                    } else if (value == 'Express') {
+                      cost = 10000.0;
+                      var weightParse = double.parse(_weight.text);
+                      cost *= weightParse;
+                    }
+                    setState(() {
+                      _grandTotal.text = cost.toString();
+                      _service = value!;
+                    });
+                  },
+                  items: services.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.green,
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.local_laundry_service_rounded,
-                  color: Color(0xFFA7F0BA),
-                ),
-                labelText: 'Service',
-                labelStyle: TextStyle(
-                  color: Color(0xFF24A148),
-                ),
-              ),
+              ],
             ),
             const SizedBox(
               height: 16,
             ),
             TextField(
               controller: _grandTotal,
+              enabled: false,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
@@ -375,29 +413,37 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
-              controller: _status,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Status',
+                  style: TextStyle(color: Colors.green),
+                ),
+                DropdownButton<String>(
+                  value: _status,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  elevation: 16,
+                  isExpanded: true,
+                  style: const TextStyle(color: Colors.green, fontSize: 16),
+                  underline: Container(
+                    height: 1,
                     color: Colors.green,
                   ),
+                  onChanged: (String? value) {
+                    // This is called when the user selects an item.
+                    setState(() {
+                      _status = value!;
+                    });
+                  },
+                  items: statuses.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.green,
-                  ),
-                ),
-                prefixIcon: Icon(
-                  Icons.wifi_protected_setup_sharp,
-                  color: Color(0xFFA7F0BA),
-                ),
-                labelText: 'Status',
-                labelStyle: TextStyle(
-                  color: Color(0xFF24A148),
-                ),
-              ),
+              ],
             ),
             const SizedBox(
               height: 16,
