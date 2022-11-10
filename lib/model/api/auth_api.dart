@@ -133,6 +133,7 @@ class AuthAPI with ChangeNotifier {
   storeUserData(apiResponse) async {
     SharedPreferences storage = await SharedPreferences.getInstance();
     await storage.setString('token', apiResponse['token']);
+    notifyListeners();
     return token;
   }
 
@@ -140,6 +141,7 @@ class AuthAPI with ChangeNotifier {
   Future<String?> getToken() async {
     SharedPreferences storage = await SharedPreferences.getInstance();
     String? token = storage.getString('token');
+    notifyListeners();
     return token;
   }
 

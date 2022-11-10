@@ -19,11 +19,6 @@ class TransactionViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  initTransactionProvider() async {
-    await getAllTransactions();
-    notifyListeners();
-  }
-
   Future<bool> addTransaction(TransactionModel transactionModel) async {
     changeState(TransactionViewState.loading);
 

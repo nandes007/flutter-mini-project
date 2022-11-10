@@ -42,34 +42,36 @@ class _CreateTransactionState extends State<CreateTransaction> {
   final _description = TextEditingController();
 
   Future<void> submit() async {
-    final result =
-        await Provider.of<TransactionViewModel>(context, listen: false)
-            .addTransaction(
-      TransactionModel(
-        beginDate: _beginDate.text,
-        customerName: _customerName.text,
-        phoneNumber: _phoneNumber.text,
-        weight: double.parse(_weight.text),
-        service: _service,
-        grandTotal: double.parse(_grandTotal.text),
-        estimateDate: _estimateDate.text,
-        endDate: _endDate.text,
-        status: _status,
-        description: _description.text,
-      ),
-    );
-
-    if (result) {
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ListTransaction(),
+    if (_formKey.currentState!.validate()) {
+      final result =
+          await Provider.of<TransactionViewModel>(context, listen: false)
+              .addTransaction(
+        TransactionModel(
+          beginDate: _beginDate.text,
+          customerName: _customerName.text,
+          phoneNumber: _phoneNumber.text,
+          weight: double.parse(_weight.text),
+          service: _service,
+          grandTotal: double.parse(_grandTotal.text),
+          estimateDate: _estimateDate.text,
+          endDate: _endDate.text,
+          status: _status,
+          description: _description.text,
         ),
       );
-    }
 
-    setState(() {});
+      if (result) {
+        // ignore: use_build_context_synchronously
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ListTransaction(),
+          ),
+        );
+      }
+
+      setState(() {});
+    }
   }
 
   String _status = statuses.first;
@@ -119,7 +121,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               onTap: () async {
                 final selectDate = await showDatePicker(
                   context: context,
@@ -161,7 +169,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               controller: _customerName,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -188,7 +202,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               controller: _phoneNumber,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -215,7 +235,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               controller: _weight,
               keyboardType: TextInputType.number,
               onChanged: ((value) {
@@ -301,7 +327,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               controller: _grandTotal,
               enabled: false,
               decoration: const InputDecoration(
@@ -329,7 +361,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               onTap: () async {
                 final selectDate = await showDatePicker(
                   context: context,
@@ -371,7 +409,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               onTap: () async {
                 final selectDate = await showDatePicker(
                   context: context,
@@ -448,7 +492,13 @@ class _CreateTransactionState extends State<CreateTransaction> {
             const SizedBox(
               height: 16,
             ),
-            TextField(
+            TextFormField(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
               controller: _description,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),

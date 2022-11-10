@@ -25,8 +25,10 @@ class _LoginPageState extends State<LoginPage> {
   final _password = TextEditingController();
 
   Future<void> submit() async {
-    final result = await Provider.of<AuthAPI>(context, listen: false)
-        .login(_email.text, _password.text);
+    if (_formKey.currentState!.validate()) {
+      await Provider.of<AuthAPI>(context, listen: false)
+          .login(_email.text, _password.text);
+    }
   }
 
   @override
@@ -104,8 +106,14 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 25),
                     child: Column(
                       children: [
-                        TextField(
+                        TextFormField(
                           controller: _email,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                             icon: Icon(
                               Icons.email_rounded,
@@ -122,8 +130,14 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        TextField(
+                        TextFormField(
                           controller: _password,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                           obscureText: true,
                           decoration: const InputDecoration(
                             icon: Icon(

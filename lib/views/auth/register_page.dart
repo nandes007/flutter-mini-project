@@ -27,18 +27,19 @@ class _RegisterPageState extends State<RegisterPage> {
   String message = 'message';
 
   Future<void> submit() async {
-    // final form = _formKey.currentState;
-    final response =
-        await Provider.of<AuthAPI>(context, listen: false).register(
-      name: _name.text,
-      email: _email.text,
-      password: _password.text,
-    );
+    if (_formKey.currentState!.validate()) {
+      final response =
+          await Provider.of<AuthAPI>(context, listen: false).register(
+        name: _name.text,
+        email: _email.text,
+        password: _password.text,
+      );
 
-    if (response['success']) {
-      Navigator.pop(context);
-    } else {
-      message = 'Fail';
+      if (response['success']) {
+        Navigator.pop(context);
+      } else {
+        message = 'Fail';
+      }
     }
   }
 
@@ -117,8 +118,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 25),
                     child: Column(
                       children: [
-                        TextField(
+                        TextFormField(
                           controller: _name,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                             icon: Icon(
                               Icons.person,
@@ -135,8 +142,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         ),
-                        TextField(
+                        TextFormField(
                           controller: _email,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                             icon: Icon(
                               Icons.email_rounded,
@@ -153,8 +166,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         ),
-                        TextField(
+                        TextFormField(
                           controller: _password,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                           obscureText: true,
                           decoration: const InputDecoration(
                             icon: Icon(
